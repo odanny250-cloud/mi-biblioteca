@@ -2,12 +2,37 @@
 session_start();
 
 if (!isset($_SESSION['id_usuario'])) {
-if (isset($_COOKIE['id_usuario'])) {
+  if (isset($_COOKIE['id_usuario'])) {
     $_SESSION['id_usuario'] = $_COOKIE["id_usuario"];
   } else {
     header("Location: index.php");
     exit();
+  }
 }
+
+// Incluir la conexión a la BD
+require_once 'db.php';
+
+// Obtener el nombre del usuario desde la BD
+$nombre_usuario = '';
+if (isset($_SESSION['id_usuario'])) {
+    try {
+        $conn = conectarDB();
+        $id = $_SESSION['id_usuario'];
+        
+        // Consulta para obtener el nombre (funciona con tu tabla)
+        $sql = "SELECT nombre FROM usuarios WHERE id_usuario = :id";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute(['id' => $id]);
+        
+        if ($row = $stmt->fetch()) {
+            $nombre_usuario = $row['nombre'];
+        } else {
+            $nombre_usuario = "Usuario ID: " . $id;
+        }
+    } catch (PDOException $e) {
+        $nombre_usuario = "Error al obtener usuario";
+    }
 }
 ?>
 <!doctype html>
@@ -28,7 +53,10 @@ if (isset($_COOKIE['id_usuario'])) {
   <div class="px-3 py-2 text-bg-primary border-bottom">
     <div class="container d-flex justify-content-between">
       <h5 class="text-white">Sistema Biblioteca</h5>
-      <a class="text-white" href="logout.php">Salir</a>
+      <div>
+        <span class="text-white me-3">Bienvenido, <?php echo htmlspecialchars($nombre_usuario); ?></span>
+        <a class="text-white" href="logout.php">Salir</a>
+      </div>
     </div>
   </div>
 </header>
@@ -64,7 +92,7 @@ if (isset($_COOKIE['id_usuario'])) {
     <!-- CONTENIDO -->
     <main class="col-9 p-4">
       <div id="article">
-        <h4>Bienvenido</h4>
+        <h4>Bienvenido, <?php echo htmlspecialchars($nombre_usuario); ?></h4>
         <p>Selecciona una opción del menú</p>
       </div>
     </main>
