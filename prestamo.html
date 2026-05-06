@@ -99,6 +99,14 @@
       .then(data => {
         alert(data);
         cargarHistorial();
+// ✅ LIMPIAR campos después de guardar
+        document.getElementById('id_usuario').value = "";
+        document.getElementById('id_libro').value = "";
+        cargarHistorial(); // Recargar historial
+    })
+    .catch(error => {
+        alert("Error al guardar: " + error);
+
       });
   }
 
