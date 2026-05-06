@@ -35,31 +35,19 @@ require_once 'db.php'; // Traemos el código del otro archivo
 	    'password' => $passwordHash
         ]);
 
-        if ($resultado) {
-            header("Location: index.html");
-            
-	   echo "El usuario se ha almacenado correctamente!  <a href='index.html'>Continuar</a>";
-	   
-        }
+         if ($resultado) {
+        // ✅ CORRECCIÓN 1: Redirigir a index.php, no index.html
+        header("Location: index.php");
+        exit(); // ✅ IMPORTANTE: Detener la ejecución después de redirigir
+    }
 
-    } catch (PDOException $e) {
-        // Manejo de errores (ej. si el email ya existe y es único)
-
-        if ($e->errorInfo[1] == 1062) {
-            
-            echo "El email ya existe, favor de intendarlo con otro correo. <a href='index.html'>Continuar</a>";
-        }else {
-        // Handle other database errors
+} catch (PDOException $e) {
+    if ($e->errorInfo[1] == 1062) {
+        // ✅ CORRECCIÓN 2: Redirigir con mensaje de error
+        header("Location: registro.html?error=email_existe");
+        exit();
+    } else {
         echo "Database Error: " . $e->getMessage();
-               
-        
     }
-     
-    }
-
-
-
-
-
-
+}
 ?>
